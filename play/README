@@ -1,0 +1,5 @@
+start the chute plus redis with 
+docker-compose up 
+
+connect to the super secure redis chute with 
+redis-cli

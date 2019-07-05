@@ -1,0 +1,65 @@
+version: "3.7"
+services:
+
+  ingress-envoy:
+    build:
+      context: .
+      dockerfile: Dockerfile-ingress
+    volumes:
+      - ./ingress-envoy.yaml:/etc/ingress-envoy.yaml
+      - ./certs:/etc/certs  
+    networks:
+      envoymesh:
+        aliases:
+          - ingress-envoy
+    expose:
+      - "6379"
+      - "8001"
+    ports:
+      - "6380:6379"
+      - "8002:8001"
+
+  egress-envoy:
+    build:
+      context: .
+      dockerfile: Dockerfile-egress
+    volumes:
+      - ./egress-envoy.yaml:/etc/egress-envoy.yaml
+      - ./certs:/etc/certs  
+    networks:
+      - envoymesh
+    expose:
+      - "6379"
+      - "8001"
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+
+  redis1:
+    build:
+      context: .
+      dockerfile: Dockerfile-redis
+    networks:
+      envoymesh:
+        aliases:
+          - redis1
+    expose:
+      - "6379"
+    ports:
+      - "6381:6379"
+
+  redis2:
+    build:
+      context: .
+      dockerfile: Dockerfile-redis
+    networks:
+      envoymesh:
+        aliases:
+          - redis2
+    expose:
+      - "6379"
+    ports:
+      - "6382:6379"
+
+networks:
+  envoymesh: {}

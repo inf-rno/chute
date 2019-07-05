@@ -1,0 +1,5 @@
+FROM envoyproxy/envoy-dev:latest
+
+RUN apt-get update && apt-get -q install -y \
+    curl
+CMD /usr/local/bin/envoy -c /etc/ingress-envoy.yaml -l debug --service-cluster ingress-proxy
