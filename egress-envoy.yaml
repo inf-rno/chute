@@ -1,3 +1,6 @@
+node:
+  cluster: test-chute
+  id: egress-envoy
 static_resources:
   listeners:
   - address:
@@ -12,6 +15,19 @@ static_resources:
           stat_prefix: egress_envoy
           cluster: ingress_envoy
   clusters:
+  - name: chute
+    connect_timeout: 1s
+    type: strict_dns
+    http2_protocol_options: {}
+    load_assignment:
+      cluster_name: chute
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: chute
+                port_value: 18000
   - name: ingress_envoy
     type: STRICT_DNS
     connect_timeout: 1s
@@ -27,14 +43,22 @@ static_resources:
                 port_value: 6379
     tls_context:
       common_tls_context:
-        tls_certificates:
-        - certificate_chain:
-            filename: /etc/certs/clientcert.pem
-          private_key:
-            filename: /etc/certs/clientkey.pem
-        validation_context:
-          trusted_ca:
-            filename: /etc/certs/cacert.pem
+        tls_certificate_sds_secret_configs:
+        - name: client_cert
+          sds_config:
+            api_config_source:
+              api_type: GRPC
+              grpc_services:
+                envoy_grpc:
+                  cluster_name: chute
+        validation_context_sds_secret_config:
+          name: client_ca
+          sds_config:
+            api_config_source:
+              api_type: GRPC
+              grpc_services:
+                envoy_grpc:
+                  cluster_name: chute
 admin:
   access_log_path: /dev/null
   address:

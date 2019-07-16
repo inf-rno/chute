@@ -1,3 +1,6 @@
+node:
+  cluster: test-chute
+  id: ingress-envoy
 static_resources:
   listeners:
   - address:
@@ -22,16 +25,36 @@ static_resources:
               op_timeout: 5s              
       tls_context:
         common_tls_context:
-          tls_certificates:
-            - certificate_chain:
-                filename: "/etc/certs/servercert.pem"
-              private_key:
-                filename: "/etc/certs/serverkey.pem"
-          validation_context:
-            trusted_ca:
-                filename: "/etc/certs/cacert.pem"
-            verify_certificate_hash: "90:CA:A3:E0:B0:AD:8E:E6:4F:BC:11:6C:7B:E5:9D:35:11:2B:46:71:5F:4D:5C:52:85:37:23:08:38:28:B4:D6"
+          tls_certificate_sds_secret_configs:
+          - name: server_cert
+            sds_config:
+              api_config_source:
+                api_type: GRPC
+                grpc_services:
+                  envoy_grpc:
+                    cluster_name: chute
+          validation_context_sds_secret_config:
+            name: server_ca
+            sds_config:
+              api_config_source:
+                api_type: GRPC
+                grpc_services:
+                  envoy_grpc:
+                    cluster_name: chute
   clusters:
+  - name: chute
+    connect_timeout: 1s
+    type: strict_dns
+    http2_protocol_options: {}
+    load_assignment:
+      cluster_name: chute
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: chute
+                port_value: 18000
   - name: redis1
     connect_timeout: 1s
     type: strict_dns

@@ -1,13 +1,35 @@
 version: "3.7"
 services:
 
+  chute:
+    container_name: chute
+    image: golang:1.12.0-stretch
+    environment:
+      - GO111MODULE=on
+    volumes:
+      - .:/go/src/github.com/inf-rno/chute
+      - $GOPATH/pkg/mod:/go/pkg/mod
+    working_dir: /go/src/github.com/inf-rno/chute
+    entrypoint: go run cmd/chute/main.go
+    networks:
+      envoymesh:
+        aliases:
+          - chute
+    expose:
+      - "18000"
+      - "18001"
+      - "8001"
+    ports:
+      - "8888:8001"
+      - "18000:18000"
+      - "18001:18001"
+
   ingress-envoy:
     build:
       context: .
       dockerfile: Dockerfile-ingress
     volumes:
       - ./ingress-envoy.yaml:/etc/ingress-envoy.yaml
-      - ./certs:/etc/certs  
     networks:
       envoymesh:
         aliases:
@@ -25,7 +47,6 @@ services:
       dockerfile: Dockerfile-egress
     volumes:
       - ./egress-envoy.yaml:/etc/egress-envoy.yaml
-      - ./certs:/etc/certs  
     networks:
       - envoymesh
     expose:
