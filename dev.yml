@@ -1,0 +1,8 @@
+name: chute
+
+up:
+  - go:
+      version: "1.12"
+      modules: on
+  - homebrew:
+      - docker
