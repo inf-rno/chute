@@ -18,9 +18,9 @@ services:
     expose:
       - "18000"
       - "18001"
-      - "8001"
+      - "8888"
     ports:
-      - "8888:8001"
+      - "8888:8888"
       - "18000:18000"
       - "18001:18001"
 
@@ -38,15 +38,15 @@ services:
       - "6379"
       - "8001"
     ports:
-      - "6380:6379"
-      - "8002:8001"
+      - "6381:6379"
+      - "8003:8001"
 
-  egress-envoy:
+  app1-envoy:
     build:
       context: .
       dockerfile: Dockerfile-egress
     volumes:
-      - ./egress-envoy.yaml:/etc/egress-envoy.yaml
+      - ./app1-envoy.yaml:/etc/egress-envoy.yaml
     networks:
       - envoymesh
     expose:
@@ -55,6 +55,21 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
+
+  app2-envoy:
+    build:
+      context: .
+      dockerfile: Dockerfile-egress
+    volumes:
+      - ./app2-envoy.yaml:/etc/egress-envoy.yaml
+    networks:
+      - envoymesh
+    expose:
+      - "6379"
+      - "8001"
+    ports:
+      - "6380:6379"
+      - "8002:8001"
 
   redis1:
     build:
@@ -67,7 +82,7 @@ services:
     expose:
       - "6379"
     ports:
-      - "6381:6379"
+      - "6382:6379"
 
   redis2:
     build:
@@ -80,7 +95,7 @@ services:
     expose:
       - "6379"
     ports:
-      - "6382:6379"
+      - "6383:6379"
 
 networks:
   envoymesh: {}

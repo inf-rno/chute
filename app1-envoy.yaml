@@ -1,6 +1,6 @@
 node:
   cluster: test-chute
-  id: egress-envoy
+  id: app1-envoy
 static_resources:
   listeners:
   - address:
@@ -42,6 +42,7 @@ static_resources:
                 address: ingress-envoy
                 port_value: 6379
     tls_context:
+      sni: "redis1"
       common_tls_context:
         tls_certificate_sds_secret_configs:
         - name: client_cert
