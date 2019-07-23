@@ -41,9 +41,9 @@ func main() {
 	als := &test.AccessLogService{}
 
 	// start the xDS server
-	go test.RunAccessLogServer(ctx, als, 8001)
+	go test.RunAccessLogServer(ctx, als, 8888)
 	go test.RunManagementServer(ctx, srv, 18000)
-	//go test.RunManagementGateway(ctx, srv, 18001)
+	go test.RunManagementGateway(ctx, srv, 18001)
 
 	snapshot := cache.Snapshot{
 		Secrets: cache.NewResources("v1", makeSecrets()),
@@ -52,13 +52,19 @@ func main() {
 		log.Printf("snapshot inconsistency: %+v\n", snapshot)
 	}
 
-	err := config.SetSnapshot("egress-envoy", snapshot)
+	err := config.SetSnapshot("ingress-envoy", snapshot)
 	if err != nil {
 		log.Printf("snapshot error %q for %+v\n", err, snapshot)
 		os.Exit(1)
 	}
 
-	err = config.SetSnapshot("ingress-envoy", snapshot)
+	err = config.SetSnapshot("app1-envoy", snapshot)
+	if err != nil {
+		log.Printf("snapshot error %q for %+v\n", err, snapshot)
+		os.Exit(1)
+	}
+
+	err = config.SetSnapshot("app2-envoy", snapshot)
 	if err != nil {
 		log.Printf("snapshot error %q for %+v\n", err, snapshot)
 		os.Exit(1)
