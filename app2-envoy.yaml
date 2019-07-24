@@ -19,6 +19,9 @@ static_resources:
     connect_timeout: 1s
     type: strict_dns
     http2_protocol_options: {}
+    upstream_connection_options:
+      tcp_keepalive: 
+        keepalive_time: 300
     load_assignment:
       cluster_name: chute
       endpoints:
@@ -45,7 +48,7 @@ static_resources:
       sni: "redis2"
       common_tls_context:
         tls_certificate_sds_secret_configs:
-        - name: client_cert
+        - name: app2_cert
           sds_config:
             api_config_source:
               api_type: GRPC
@@ -53,7 +56,7 @@ static_resources:
                 envoy_grpc:
                   cluster_name: chute
         validation_context_sds_secret_config:
-          name: client_ca
+          name: app_ca
           sds_config:
             api_config_source:
               api_type: GRPC
