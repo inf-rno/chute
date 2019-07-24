@@ -121,7 +121,7 @@ func (cb *callbacks) OnFetchRequest(_ context.Context, req *v2.DiscoveryRequest)
 func (cb *callbacks) OnFetchResponse(*v2.DiscoveryRequest, *v2.DiscoveryResponse) {}
 
 const (
-	clientKey = `-----BEGIN RSA PRIVATE KEY-----
+	app1Key = `-----BEGIN RSA PRIVATE KEY-----
 MIIEogIBAAKCAQEAqLi5RmzH6TleUof821DaOhh84aQdUP1Ksc5HZoHReLc5t8PN
 0KpGtv0OEeP14t4Jm1JbM38NgMfKLiGz5ceZv9f8rb1FTnMr5LLvmnvdlj+tp7pC
 90Sy7eHLb0ogNIvRXhazZrjPkf3EnTH/bZdtIXi9v24ApiJTa+ovijLGUJVptxkZ
@@ -149,7 +149,7 @@ kq6nAoGAN8dAwrJFQ2mQYKFQrbWt3/x+YHCAvkqIFdVWn9+3/fWZ8Rcwctl/mau/
 koYsIpn/e+t2AVR1UENvv9sKwAsDV1yqHwRfUSFtg/qtj7103YY=
 -----END RSA PRIVATE KEY-----`
 
-	clientCert = `-----BEGIN CERTIFICATE-----
+	app1Cert = `-----BEGIN CERTIFICATE-----
 MIIEZDCCA0ygAwIBAgIJAILStmLgUUcXMA0GCSqGSIb3DQEBCwUAMHYxCzAJBgNV
 BAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1TYW4gRnJhbmNp
 c2NvMQ0wCwYDVQQKDARMeWZ0MRkwFwYDVQQLDBBMeWZ0IEVuZ2luZWVyaW5nMRAw
@@ -176,7 +176,64 @@ ACWk3wTxIPUv6mc8kbBMRMPkETzWt4m/qdLnUUhFKJdyACPlb6onJe1TGuYJvc2x
 rNV3U8Yo8a1iskQtHqNfc+kqVd3MpgsB
 -----END CERTIFICATE-----`
 
-	clientHash = `90:CA:A3:E0:B0:AD:8E:E6:4F:BC:11:6C:7B:E5:9D:35:11:2B:46:71:5F:4D:5C:52:85:37:23:08:38:28:B4:D6`
+	app1Hash = `90:CA:A3:E0:B0:AD:8E:E6:4F:BC:11:6C:7B:E5:9D:35:11:2B:46:71:5F:4D:5C:52:85:37:23:08:38:28:B4:D6`
+
+	app2Key = `-----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEAqLi5RmzH6TleUof821DaOhh84aQdUP1Ksc5HZoHReLc5t8PN
+0KpGtv0OEeP14t4Jm1JbM38NgMfKLiGz5ceZv9f8rb1FTnMr5LLvmnvdlj+tp7pC
+90Sy7eHLb0ogNIvRXhazZrjPkf3EnTH/bZdtIXi9v24ApiJTa+ovijLGUJVptxkZ
+2q34fEVsMs6lQyy07zjvofY8R3ympzdQcCJtEWB0YMX8noXpeGr+rfcbMpROHbRr
+5OAzu2jvfCHzbZ+qx8riGNoPFqeDMG7PWfrl0gnPPzUwjpvRkrxtoSUjCHanZxEy
+3+Xk4kVAdxReHpd51zYTkxa9IgMnS+2yGKpKawIDAQABAoIBAA1Ivg21cugCBFMr
+MdVywDviwbJiYYyG5OKrAyQnBH8krf6yA/px7a9qrTjrYejC4q7ABT5AuqdxE5Ie
+RTPKS2i3cMWdKV/L4aDYFdVr+z5hNSMHn04oso3YQVQ52d9JQurNjsJ/upgcCub1
+kM7oJUeFYis4VgS+nyLYBXY0GTku6aheM/+Z0xTEvIc3Cfzb94aCqnGwHe+TvxN0
+zCKhm4bUO4HE5UQzHXO9oxMlOlI7hDAUTSfhT0FpOtxnmisl+XFRSGSvJmNbK4jJ
+8dlqIuXsSh4X9NPEnhPz1ieg4+hcUelg5SvSNLNAVQPmm1nNluwYhT41iU+seiiJ
+A3uUJEECgYEA2fAS32IQox/8+OpKPipvR13tHek04AsJSGuNiio8qXlQorlXBRYE
+esOEEYJyKiNWZ7NXTCAjyDiRp48aM62Fy1ykDR4IbDb8JRAdZpJBCjy5U5BKfZTY
+jR3rZOA+8Bivozmtdv+0RGxhffSIGPpB1/4Dgmkw375YLAB4cVffg30CgYEAxjA1
+o8ImIW+9eKTRV2yWUHiUZ4iae5s54nCnz24YqJVLooWtU/TXFKrTiYJs20HBWiG0
++dsJ27LXd0Y13DDQN/ZT/luvWbhMkFYGQ7Ou7XDXB6ujgl6A5MZ7mKfxIv+kX5QM
+F1NTVl3TeUU+6XAYeUf1xmlDjot3sNNv5NdvGgcCgYBRzUnYLP/fqscSSyaY1Oa1
+2+x/mKQvIBVY6H3VCWuBlTaODZE7KHt/9NkilVrytBbfj7JJsZqcsZcCVLVaBly8
+60XsYoR40d6srrLKaEUfaZGKaxN6tZ7ewQc08vLMvgdW9fRFQU9Ri3jAhUN8VJrY
+TtDUZ1Vf9hs0UOzkZj5QJQKBgCfS7iRe0eysGGWSsOIhVr8Ky79WKrylv2bp/j5n
+QBs4DL+2ntKdA08K2IDsLVWNi/3Bgi0mv39fG37DI/V/9YcZP12ALOcZaoEiWBXo
+mEDsCLlo2u1KchoGbDWLoZ/HwM7X3+ob+0YCioj2yiJ8PN66AAADjOiqy71Db1uL
+kq6nAoGAN8dAwrJFQ2mQYKFQrbWt3/x+YHCAvkqIFdVWn9+3/fWZ8Rcwctl/mau/
+7dL5tU/s3wO8KkOH2PTjvtUORZR+e/FGq7hmXVV1lnl7GBENW6THN08xq9e/4Clm
+koYsIpn/e+t2AVR1UENvv9sKwAsDV1yqHwRfUSFtg/qtj7103YY=
+-----END RSA PRIVATE KEY-----`
+
+	app2Cert = `-----BEGIN CERTIFICATE-----
+MIIEZDCCA0ygAwIBAgIJAILStmLgUUcXMA0GCSqGSIb3DQEBCwUAMHYxCzAJBgNV
+BAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1TYW4gRnJhbmNp
+c2NvMQ0wCwYDVQQKDARMeWZ0MRkwFwYDVQQLDBBMeWZ0IEVuZ2luZWVyaW5nMRAw
+DgYDVQQDDAdUZXN0IENBMB4XDTE4MTIxNzIwMTgwMFoXDTIwMTIxNjIwMTgwMFow
+gagxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1T
+YW4gRnJhbmNpc2NvMQ0wCwYDVQQKDARMeWZ0MRkwFwYDVQQLDBBMeWZ0IEVuZ2lu
+ZWVyaW5nMRswGQYDVQQDDBJUZXN0IEZyb250ZW5kIFRlYW0xJTAjBgkqhkiG9w0B
+CQEWFmZyb250ZW5kLXRlYW1AbHlmdC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IB
+DwAwggEKAoIBAQCouLlGbMfpOV5Sh/zbUNo6GHzhpB1Q/UqxzkdmgdF4tzm3w83Q
+qka2/Q4R4/Xi3gmbUlszfw2Ax8ouIbPlx5m/1/ytvUVOcyvksu+ae92WP62nukL3
+RLLt4ctvSiA0i9FeFrNmuM+R/cSdMf9tl20heL2/bgCmIlNr6i+KMsZQlWm3GRna
+rfh8RWwyzqVDLLTvOO+h9jxHfKanN1BwIm0RYHRgxfyehel4av6t9xsylE4dtGvk
+4DO7aO98IfNtn6rHyuIY2g8Wp4Mwbs9Z+uXSCc8/NTCOm9GSvG2hJSMIdqdnETLf
+5eTiRUB3FF4el3nXNhOTFr0iAydL7bIYqkprAgMBAAGjgcEwgb4wDAYDVR0TAQH/
+BAIwADALBgNVHQ8EBAMCBeAwHQYDVR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMB
+MEIGA1UdEQQ7MDmGH3NwaWZmZTovL2x5ZnQuY29tL2Zyb250ZW5kLXRlYW2CCGx5
+ZnQuY29tggx3d3cubHlmdC5jb20wHQYDVR0OBBYEFJD5l1K7mp/dUUNXvXPBWJ5l
+oJOnMB8GA1UdIwQYMBaAFBQz1vaSbPuePL++7GTMqLAMtk3kMA0GCSqGSIb3DQEB
+CwUAA4IBAQCJOUQB5d8ZCEeMrY0jLwefY8L0UluhPFWNlw1t2LyDjAa8qRNkWJ/2
+bky7IHBMxPQIdYBVPsQGOQ4bkg3S7Eqyc0WZYpLlKEQeUFPG752642GInzjgY3KG
+f1hIHz1quIYARjF5GJ+buZpw3DgcGDnhYygFQDWqgyRnfz84M1ycEx06yHidupyp
+eMHZHXcrSXPcGin7a6tBEppDFm5CcrJQ2hySDVkl9qnbgHr0+0JZg/Qekik4aWv5
+ACWk3wTxIPUv6mc8kbBMRMPkETzWt4m/qdLnUUhFKJdyACPlb6onJe1TGuYJvc2x
+rNV3U8Yo8a1iskQtHqNfc+kqVd3MpgsB
+-----END CERTIFICATE-----`
+
+	app2Hash = `90:CA:A3:E0:B0:AD:8E:E6:4F:BC:11:6C:7B:E5:9D:35:11:2B:46:71:5F:4D:5C:52:85:37:23:08:38:28:B4:D6`
 
 	serverKey = `-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEAuvPdQdmwZongPAgQho/Vipd3PZWrQ6BKxIb4l/RvqtVP321I
@@ -261,20 +318,33 @@ j8xsEV8PxmOIaJ/M+fqE+Zi2Ljp3a+9X/nLakR6ohMNTbrGMQWrGIpFqCj6pIwek
 func makeSecrets() []cache.Resource {
 	return []cache.Resource{
 		&auth.Secret{
-			Name: "client_cert",
+			Name: "app1_cert",
 			Type: &auth.Secret_TlsCertificate{
 				TlsCertificate: &auth.TlsCertificate{
 					PrivateKey: &core.DataSource{
-						Specifier: &core.DataSource_InlineBytes{InlineBytes: []byte(clientKey)},
+						Specifier: &core.DataSource_InlineBytes{InlineBytes: []byte(app1Key)},
 					},
 					CertificateChain: &core.DataSource{
-						Specifier: &core.DataSource_InlineBytes{InlineBytes: []byte(clientCert)},
+						Specifier: &core.DataSource_InlineBytes{InlineBytes: []byte(app1Cert)},
 					},
 				},
 			},
 		},
 		&auth.Secret{
-			Name: "client_ca",
+			Name: "app2_cert",
+			Type: &auth.Secret_TlsCertificate{
+				TlsCertificate: &auth.TlsCertificate{
+					PrivateKey: &core.DataSource{
+						Specifier: &core.DataSource_InlineBytes{InlineBytes: []byte(app2Key)},
+					},
+					CertificateChain: &core.DataSource{
+						Specifier: &core.DataSource_InlineBytes{InlineBytes: []byte(app2Cert)},
+					},
+				},
+			},
+		},
+		&auth.Secret{
+			Name: "app_ca",
 			Type: &auth.Secret_ValidationContext{
 				ValidationContext: &auth.CertificateValidationContext{
 					TrustedCa: &core.DataSource{
@@ -297,13 +367,24 @@ func makeSecrets() []cache.Resource {
 			},
 		},
 		&auth.Secret{
-			Name: "server_ca",
+			Name: "redis1_validation",
 			Type: &auth.Secret_ValidationContext{
 				ValidationContext: &auth.CertificateValidationContext{
 					TrustedCa: &core.DataSource{
 						Specifier: &core.DataSource_InlineBytes{InlineBytes: []byte(caCert)},
 					},
-					VerifyCertificateHash: []string{clientHash},
+					VerifyCertificateHash: []string{app1Hash},
+				},
+			},
+		},
+		&auth.Secret{
+			Name: "redis2_validation",
+			Type: &auth.Secret_ValidationContext{
+				ValidationContext: &auth.CertificateValidationContext{
+					TrustedCa: &core.DataSource{
+						Specifier: &core.DataSource_InlineBytes{InlineBytes: []byte(caCert)},
+					},
+					VerifyCertificateHash: []string{app2Hash},
 				},
 			},
 		},

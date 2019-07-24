@@ -10,36 +10,75 @@ static_resources:
     listener_filters:
       - name: "envoy.listener.tls_inspector"
     filter_chains:
-      filters:
-        - name: envoy.filters.network.sni_cluster
-        - name: envoy.tcp_proxy
-          typed_config:
-            "@type": type.googleapis.com/envoy.config.filter.network.tcp_proxy.v2.TcpProxy
-            stat_prefix: ingress_envoy
-            cluster: redis1
-      tls_context:
-        common_tls_context:
-          tls_certificate_sds_secret_configs:
-          - name: server_cert
-            sds_config:
-              api_config_source:
-                api_type: GRPC
-                grpc_services:
-                  envoy_grpc:
-                    cluster_name: chute
-          validation_context_sds_secret_config:
-            name: server_ca
-            sds_config:
-              api_config_source:
-                api_type: GRPC
-                grpc_services:
-                  envoy_grpc:
-                    cluster_name: chute
+      - filter_chain_match:
+          server_names: ["redis1"]
+        tls_context:
+          common_tls_context:
+            tls_certificate_sds_secret_configs:
+            - name: server_cert
+              sds_config:
+                api_config_source:
+                  api_type: GRPC
+                  grpc_services:
+                    envoy_grpc:
+                      cluster_name: chute
+            validation_context_sds_secret_config:
+              name: redis1_validation
+              sds_config:
+                api_config_source:
+                  api_type: GRPC
+                  grpc_services:
+                    envoy_grpc:
+                      cluster_name: chute
+        filters:
+          - name: envoy.tcp_proxy
+            typed_config:
+              "@type": type.googleapis.com/envoy.config.filter.network.tcp_proxy.v2.TcpProxy
+              stat_prefix: ingress_envoy
+              cluster: redis1
+      - filter_chain_match:
+          server_names: ["redis2"]
+        tls_context:
+          common_tls_context:
+            tls_certificate_sds_secret_configs:
+            - name: server_cert
+              sds_config:
+                api_config_source:
+                  api_type: GRPC
+                  grpc_services:
+                    envoy_grpc:
+                      cluster_name: chute
+            validation_context_sds_secret_config:
+              name: redis2_validation
+              sds_config:
+                api_config_source:
+                  api_type: GRPC
+                  grpc_services:
+                    envoy_grpc:
+                      cluster_name: chute
+        filters:
+          - name: envoy.redis_proxy
+            typed_config:
+              "@type": type.googleapis.com/envoy.config.filter.network.redis_proxy.v2.RedisProxy
+              stat_prefix: ingress_envoy
+              prefix_routes:
+                routes:
+                  - prefix: "1:"
+                    cluster: redis1
+                  - prefix: "2:"
+                    cluster: redis2
+                catch_all_route: 
+                  cluster: redis1
+              settings:
+                op_timeout: 5s              
   clusters:
   - name: chute
     connect_timeout: 1s
     type: strict_dns
     http2_protocol_options: {}
+    upstream_connection_options:
+      tcp_keepalive: 
+        keepalive_time: 300
     load_assignment:
       cluster_name: chute
       endpoints:
