@@ -1,6 +1,9 @@
 node:
   cluster: test-chute
   id: ingress-envoy
+cluster_manager:
+  outlier_detection:
+    event_log_path: "/logs/outlier"
 static_resources:
   listeners:
   - address:
@@ -68,9 +71,10 @@ static_resources:
                   - prefix: "2:"
                     cluster: redis2
                 catch_all_route: 
-                  cluster: redis1
+                  cluster: redis2
               settings:
-                op_timeout: 5s              
+                op_timeout: 5s
+                enable_hashtagging: true            
   clusters:
   - name: chute
     connect_timeout: 1s
@@ -89,7 +93,7 @@ static_resources:
                 address: chute
                 port_value: 18000
   - name: redis1
-    connect_timeout: 1s
+    connect_timeout: 5s
     type: strict_dns
     lb_policy: MAGLEV
     load_assignment:
@@ -102,9 +106,19 @@ static_resources:
                 address: redis1
                 port_value: 6379
   - name: redis2
-    connect_timeout: 1s
+    connect_timeout: 5s
     type: strict_dns
+    respect_dns_ttl: true
     lb_policy: MAGLEV
+    health_checks: 
+      interval: 1s
+      timeout: 0.5s
+      healthy_threshold: 1
+      unhealthy_threshold: 5
+      event_log_path: "/logs/health"
+      custom_health_check:
+        name: envoy.health_checkers.redis
+    outlier_detection:
     load_assignment:
       cluster_name: redis2
       endpoints:
@@ -113,6 +127,12 @@ static_resources:
             address:
               socket_address:
                 address: redis2
+                port_value: 6379
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: redis1
                 port_value: 6379
 admin:
   access_log_path: "/dev/null"

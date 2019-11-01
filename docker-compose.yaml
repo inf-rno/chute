@@ -3,7 +3,7 @@ services:
 
   chute:
     container_name: chute
-    image: golang:1.12.0-stretch
+    image: golang:1.13.1-stretch
     environment:
       - GO111MODULE=on
     volumes:
@@ -30,6 +30,7 @@ services:
       dockerfile: Dockerfile-ingress
     volumes:
       - ./ingress-envoy.yaml:/etc/ingress-envoy.yaml
+      - ./logs:/logs
     networks:
       envoymesh:
         aliases:
