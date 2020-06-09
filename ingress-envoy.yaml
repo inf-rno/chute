@@ -74,7 +74,7 @@ static_resources:
                   cluster: redis2
               settings:
                 op_timeout: 5s
-                enable_hashtagging: true            
+                enable_hashtagging: true
   clusters:
   - name: chute
     connect_timeout: 1s
@@ -110,15 +110,18 @@ static_resources:
     type: strict_dns
     respect_dns_ttl: true
     lb_policy: MAGLEV
-    health_checks: 
-      interval: 1s
-      timeout: 0.5s
-      healthy_threshold: 1
-      unhealthy_threshold: 5
-      event_log_path: "/logs/health"
-      custom_health_check:
-        name: envoy.health_checkers.redis
-    outlier_detection:
+    common_lb_config:
+      consistent_hashing_lb_config:
+        use_hostname_for_hashing: true
+    # health_checks: 
+    #   interval: 1s
+    #   timeout: 0.5s
+    #   healthy_threshold: 1
+    #   unhealthy_threshold: 5
+    #   event_log_path: "/logs/health"
+    #   custom_health_check:
+    #     name: envoy.health_checkers.redis
+    # outlier_detection:
     load_assignment:
       cluster_name: redis2
       endpoints:
